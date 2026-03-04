@@ -2,9 +2,9 @@ name: Unit Test
 
 on:
   push:
-    branches: [ 'main', 'release-*' ]
+    branches: [main, release-*]
   pull_request:
-    branches: [ 'main', 'release-*' ]
+    branches: [main, release-*]
 
 jobs:
 
@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         go-version: [1.21.x]
-        platform: [ubuntu-latest]
+        platform: [ubuntu-22.04]
 
     runs-on: ${{ matrix.platform }}
 

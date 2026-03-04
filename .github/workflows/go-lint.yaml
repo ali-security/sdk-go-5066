@@ -2,15 +2,15 @@ name: Code Style
 
 on:
   push:
-    branches: [ 'main', 'release-*' ]
+    branches: [main, release-*]
   pull_request:
-    branches: [ 'main', 'release-*' ]
+    branches: [main, release-*]
 
 jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code

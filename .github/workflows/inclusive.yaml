@@ -2,13 +2,13 @@ name: Inclusive
 
 on:
   pull_request:
-    branches: [ 'main', 'release-*' ]
+    branches: [main, release-*]
 
 jobs:
 
   language:
     name: Language
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
 

@@ -8,7 +8,7 @@ on:
 jobs:
   semver:
     name: Calculate Next Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       next: ${{ steps.ggsv.outputs.next}}
     steps:
@@ -29,7 +29,7 @@ jobs:
 
   mainmodule:
     name: Release Main Module
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: semver
     steps:
       - name: Checkout Code
@@ -46,7 +46,7 @@ jobs:
 
   submodules:
     name: Release Sub-Modules
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
       - semver
       - mainmodule
@@ -79,7 +79,7 @@ jobs:
 
   examples:
     name: Update Examples
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
       - semver
       - mainmodule

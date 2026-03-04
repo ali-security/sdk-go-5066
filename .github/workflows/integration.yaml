@@ -2,9 +2,9 @@ name: Integration Tests
 
 on:
   push:
-    branches: [ 'main', 'release-*' ]
+    branches: [main, release-*]
   pull_request:
-    branches: [ 'main', 'release-*' ]
+    branches: [main, release-*]
 
 jobs:
 
@@ -14,7 +14,7 @@ jobs:
       matrix:
         # Only test one go version: the integration tests don't seem to pass if NATS runs more one running at a time.
         go-version: [1.21.x]
-        platform: [ubuntu-latest]
+        platform: [ubuntu-22.04]
 
     runs-on: ${{ matrix.platform }}
 
@@ -34,8 +34,8 @@ jobs:
 
       jetstream:
         image: bitnami/nats:latest
-        env: 
-          NATS_EXTRA_ARGS: "--jetstream --port 4223"
+        env:
+          NATS_EXTRA_ARGS: --jetstream --port 4223
         ports:
           - 4223:4223
 
@@ -61,7 +61,7 @@ jobs:
             }
         ports:
           - 5672:5672
-      
+
       mqtt:
         image: eclipse-mosquitto:1.6
         ports:
@@ -77,7 +77,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
           cache-dependency-path: v2/go.sum
         id: go
-        
+
       - name: Test
         run: ./hack/integration-test.sh
 

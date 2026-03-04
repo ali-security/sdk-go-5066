@@ -2,15 +2,15 @@ name: Go Format
 
 on:
   push:
-    branches: [ 'main', 'release-*' ]
+    branches: [main, release-*]
   pull_request:
-    branches: [ 'main', 'release-*' ]
+    branches: [main, release-*]
 
 jobs:
 
   format:
     name: Format
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
