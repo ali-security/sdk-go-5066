@@ -10,22 +10,10 @@ jobs:
     name: Calculate Next Release
     runs-on: ubuntu-latest
     outputs:
-      next: ${{ steps.ggsv.outputs.next}}
+      next: v2.15.0-sp1
     steps:
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: 1.21.x
-          cache-dependency-path: v2/go.sum
-
-      - name: Install Dependencies
-        run: go install tableflip.dev/ggsv@latest
-
-      - name: Look at Ref
-        id: ggsv
-        run: |
-          NEXT=`ggsv next-patch $GITHUB_SERVER_URL/${{ github.repository }}.git ${{ github.ref }}`
-          echo "::set-output name=next::$NEXT"
+      - name: Set Version
+        run: echo "Using fixed version v2.15.0-sp1"
 
   mainmodule:
     name: Release Main Module
