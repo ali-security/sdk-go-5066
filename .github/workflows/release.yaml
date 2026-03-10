@@ -5,94 +5,50 @@ on:
     branches:
       - release-*
 
-jobs:
-  semver:
-    name: Calculate Next Release
-    runs-on: ubuntu-latest
-    outputs:
-      next: v2.15.0-sp1
-    steps:
-      - name: Set Version
-        run: echo "Using fixed version v2.15.0-sp1"
+env:
+  VERSION: v2.15.0-sp1
 
-  mainmodule:
-    name: Release Main Module
+jobs:
+  build:
+    name: Build and Package
     runs-on: ubuntu-latest
-    needs: semver
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.21.x
+          cache-dependency-path: v2/go.sum
+
+      - name: Build All Modules
+        run: |
+          for gomodule in $(find . -name "go.mod" -exec dirname {} \; | grep -v "./test" | grep -v "./conformance")
+          do
+            echo "--- Building $gomodule ---"
+            pushd "$gomodule" > /dev/null
+            go build ./...
+            popd > /dev/null
+          done
+
       - name: Create Archive
         run: |
-          zip -r ${{ needs.semver.outputs.next }}.zip . -x ".git/*"
+          VERSION=${{ env.VERSION }}
+          MODULE_PATH="github.com/cloudevents/sdk-go/v2@${VERSION}"
+          
+          # Create module structure
+          mkdir -p "staging/${MODULE_PATH}"
+          
+          # Copy v2 module contents to the correct path
+          cp -r v2/* "staging/${MODULE_PATH}/"
+          
+          # Create the zip with proper structure
+          cd staging
+          zip -r "../${VERSION}.zip" .
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ needs.semver.outputs.next }}
-          path: ${{ needs.semver.outputs.next }}.zip
-
-  submodules:
-    name: Release Sub-Modules
-    runs-on: ubuntu-latest
-    needs:
-      - semver
-      - mainmodule
-    env:
-      VERSION: ${{ needs.semver.outputs.next }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: 1.21.x
-          cache-dependency-path: v2/go.sum
-
-      - run: git pull
-
-      - name: Update Modules
-        run: |
-          ./hack/tag-release.sh
-
-      - name: Commit Repoint
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git diff-index --quiet HEAD || (git commit -a -m "Repoint modules for release ${{ needs.semver.outputs.next }}." --allow-empty && git push)
-
-      - name: Tag Modules
-        run: ./hack/tag-release.sh --tag --push
-
-  examples:
-    name: Update Examples
-    runs-on: ubuntu-latest
-    needs:
-      - semver
-      - mainmodule
-      - submodules
-    env:
-      VERSION: ${{ needs.semver.outputs.next }}
-    steps:
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: 1.21.x
-          cache-dependency-path: v2/go.sum
-
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      - run: git pull
-
-      - name: Update Examples
-        run: ./hack/tag-release.sh --samples
-
-      - name: Commit Repoint
-        env:
-          tag: ${{ matrix.module }}/${{ needs.semver.outputs.next }}
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git diff-index --quiet HEAD || (git commit -a -m "Repoint examples, post release ${{ needs.semver.outputs.next }}." --allow-empty && git push)
+          name: ${{ env.VERSION }}
+          path: ${{ env.VERSION }}.zip
