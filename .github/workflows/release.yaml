@@ -6,7 +6,7 @@ on:
       - release-*
 
 env:
-  VERSION: v2.15.0-sp1
+  VERSION: v2.15.0
 
 jobs:
   build:
