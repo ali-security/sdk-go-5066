@@ -23,14 +23,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Create Release ${{ needs.semver.outputs.next }}
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Archive
+        run: |
+          zip -r ${{ needs.semver.outputs.next }}.zip . -x ".git/*"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ needs.semver.outputs.next }}
-          release_name: Release ${{ needs.semver.outputs.next }}
-          prerelease: false
+          name: ${{ needs.semver.outputs.next }}
+          path: ${{ needs.semver.outputs.next }}.zip
 
   submodules:
     name: Release Sub-Modules
